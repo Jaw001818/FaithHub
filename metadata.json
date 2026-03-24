@@ -1,0 +1,5 @@
+{
+  "name": "ChordFlow",
+  "description": "A musician-friendly lyrics and chords viewer with real-time transposition and auto-scroll.",
+  "requestFramePermissions": []
+}
