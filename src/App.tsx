@@ -38,7 +38,16 @@ export default function App() {
   const [designVerse, setDesignVerse] = useState<BibleVerse | null>(null);
   const [bibleMaxVerses, setBibleMaxVerses] = useState(31);
   
+  // Design Modal State
+  const [designConfig, setDesignConfig] = useState({
+    theme: 'light',
+    font: 'serif',
+    align: 'center',
+    gradient: 'warm'
+  });
+  
   const scrollInterval = useRef<number | null>(null);
+  const mainContentRef = useRef<HTMLDivElement>(null);
 
   // Load data from localStorage
   useEffect(() => {
@@ -282,9 +291,9 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (isScrolling) {
+    if (isScrolling && mainContentRef.current) {
       scrollInterval.current = window.setInterval(() => {
-        window.scrollBy(0, scrollSpeed);
+        mainContentRef.current?.scrollBy(0, scrollSpeed);
       }, 50);
     } else {
       if (scrollInterval.current) clearInterval(scrollInterval.current);
@@ -331,22 +340,24 @@ export default function App() {
           width: isSidebarOpen ? (window.innerWidth < 640 ? '100%' : '320px') : '0px',
           x: isSidebarOpen ? 0 : -320
         }}
-        className="fixed lg:relative h-screen bg-[#111] border-r border-white/10 z-[70] overflow-hidden flex flex-col"
+        className="fixed lg:sticky top-0 left-0 h-screen bg-[#0a0a0a] border-r border-white/10 flex flex-col z-[70] lg:z-40 overflow-hidden"
       >
-        <div className="p-4 border-b border-white/10 flex flex-col gap-4 min-w-[320px]">
+        <div className="p-6 space-y-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ListMusic className="w-5 h-5 text-blue-400" />
-              <h2 className="font-bold text-lg text-white">Lineup</h2>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20">
+                <Music className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-black tracking-tighter text-white">CHORDLY</h1>
+                <p className="text-[10px] font-bold text-blue-500 tracking-[0.2em] uppercase">Pro Setlist</p>
+              </div>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={clearAllFolders} className="p-2 hover:bg-red-500/10 text-white/40 hover:text-red-400 rounded-full transition-colors" title="Clear All">
-                <LogOut className="w-5 h-5" />
-              </button>
-              <button onClick={createFolder} className="p-2 hover:bg-white/5 rounded-full transition-colors" title="New Folder">
-                <FolderPlus className="w-5 h-5" />
-              </button>
-              <button onClick={() => setIsSidebarOpen(false)} className="p-2 hover:bg-white/5 rounded-full lg:hidden">
+              <button 
+                onClick={() => setIsSidebarOpen(false)}
+                className="lg:hidden p-2 hover:bg-white/5 rounded-lg text-white/40"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -424,40 +435,54 @@ export default function App() {
       </motion.aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 h-screen overflow-y-auto relative flex flex-col">
+      <div 
+        ref={mainContentRef}
+        className="flex-1 h-screen overflow-y-auto relative flex flex-col"
+      >
         {/* Sticky Header */}
         <header className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/10 px-4 py-3">
           <div className="max-w-4xl mx-auto flex flex-col gap-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <button 
-                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                  className={`p-2 rounded-lg transition-colors ${isSidebarOpen ? 'bg-blue-600 text-white' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
-                >
-                  <ListMusic className="w-5 h-5" />
-                </button>
-                <div className="flex items-center gap-4 bg-white/5 rounded-full p-1">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+              <div className="flex items-center justify-between sm:justify-start gap-4">
+                <div className="flex items-center gap-2">
                   <button 
-                    onClick={() => setActiveTab('chords')}
-                    className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${activeTab === 'chords' ? 'bg-blue-600 text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
+                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    className={`p-2 rounded-lg transition-colors ${isSidebarOpen ? 'bg-blue-600 text-white' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
                   >
-                    Chords
+                    <ListMusic className="w-5 h-5" />
                   </button>
+                  <div className="flex items-center gap-1 bg-white/5 rounded-full p-1">
+                    <button 
+                      onClick={() => setActiveTab('chords')}
+                      className={`px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${activeTab === 'chords' ? 'bg-blue-600 text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
+                    >
+                      Chords
+                    </button>
+                    <button 
+                      onClick={() => setActiveTab('bible')}
+                      className={`px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${activeTab === 'bible' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
+                    >
+                      Bible
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex sm:hidden items-center gap-2">
                   <button 
-                    onClick={() => setActiveTab('bible')}
-                    className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${activeTab === 'bible' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
+                    onClick={() => setIsScrolling(!isScrolling)}
+                    className={`p-2 rounded-full transition-colors ${isScrolling ? 'bg-blue-600 text-white' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
                   >
-                    Bible
+                    {isScrolling ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
 
-              <div className="flex-1 max-w-md relative">
+              <div className="flex-1 relative">
                 <form onSubmit={handleSearch} className="relative">
                   <input
                     type="text"
                     placeholder="Search songs..."
-                    className="w-full bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -499,7 +524,7 @@ export default function App() {
                 </AnimatePresence>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-2">
                 <button 
                   onClick={() => setIsScrolling(!isScrolling)}
                   className={`p-2 rounded-full transition-colors ${isScrolling ? 'bg-blue-600 text-white' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
@@ -513,17 +538,17 @@ export default function App() {
               <motion.div 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-white/5"
+                className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2 border-t border-white/5"
               >
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center bg-white/5 rounded-lg p-1">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                  <div className="flex items-center bg-white/5 rounded-lg p-1 flex-1 sm:flex-none justify-between sm:justify-start">
                     <button onClick={() => setTranspose(t => t - 1)} className="p-1.5 hover:bg-white/10 rounded-md"><Minus className="w-4 h-4" /></button>
-                    <div className="px-3 flex flex-col items-center min-w-[80px]">
-                      <span className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Transpose</span>
+                    <div className="px-2 sm:px-3 flex flex-col items-center min-w-[60px] sm:min-w-[80px]">
+                      <span className="text-[8px] sm:text-[10px] uppercase tracking-widest text-white/40 font-bold">Transpose</span>
                       <select 
                         value={getRootNote(currentKey)}
                         onChange={(e) => handleKeyChange(e.target.value)}
-                        className="bg-transparent font-mono font-bold text-blue-400 focus:outline-none cursor-pointer appearance-none text-center"
+                        className="bg-transparent font-mono font-bold text-blue-400 focus:outline-none cursor-pointer appearance-none text-center text-sm sm:text-base"
                       >
                         {NOTES.map(note => <option key={note} value={note} className="bg-[#1a1a1a] text-white">{note}</option>)}
                       </select>
@@ -533,8 +558,8 @@ export default function App() {
                   
                   <button onClick={() => setTranspose(0)} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-white/60"><RotateCcw className="w-4 h-4" /></button>
 
-                  <div className="relative group/folder">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all shadow-lg shadow-blue-900/20">
+                  <div className="relative group/folder flex-1 sm:flex-none">
+                    <button className="w-full flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs sm:text-sm font-medium transition-all shadow-lg shadow-blue-900/20">
                       <Plus className="w-4 h-4" />
                       Add to Folder
                       <ChevronDown className="w-4 h-4" />
@@ -564,14 +589,14 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-6">
-                  <div className="flex flex-col items-end">
-                    <span className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Scroll Speed</span>
-                    <input type="range" min="0.5" max="5" step="0.5" value={scrollSpeed} onChange={(e) => setScrollSpeed(parseFloat(e.target.value))} className="w-24 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500" />
+                <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6">
+                  <div className="flex flex-col items-start sm:items-end flex-1 sm:flex-none">
+                    <span className="text-[8px] sm:text-[10px] uppercase tracking-widest text-white/40 font-bold">Scroll Speed</span>
+                    <input type="range" min="0.5" max="5" step="0.5" value={scrollSpeed} onChange={(e) => setScrollSpeed(parseFloat(e.target.value))} className="w-full sm:w-24 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500" />
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Capo</span>
-                    <span className="font-mono font-bold text-orange-400">{transpose < 0 ? `Fret ${Math.abs(transpose)}` : 'None'}</span>
+                    <span className="text-[8px] sm:text-[10px] uppercase tracking-widest text-white/40 font-bold">Capo</span>
+                    <span className="font-mono font-bold text-orange-400 text-xs sm:text-sm">{transpose < 0 ? `Fret ${Math.abs(transpose)}` : 'None'}</span>
                   </div>
                 </div>
               </motion.div>
@@ -590,14 +615,14 @@ export default function App() {
               ) : song ? (
                 <motion.div key="song" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                   <div className="space-y-1">
-                    <h2 className="text-4xl font-bold tracking-tight text-white">{song.title}</h2>
-                    <p className="text-xl text-white/40 italic">{song.artist}</p>
+                    <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">{song.title}</h2>
+                    <p className="text-lg sm:text-xl text-white/40 italic">{song.artist}</p>
                   </div>
-                  <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 sm:p-10 shadow-2xl">
-                    <div className="font-mono text-lg leading-relaxed overflow-x-auto whitespace-pre">
+                  <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-10 shadow-2xl overflow-hidden">
+                    <div className="font-mono text-sm sm:text-lg leading-relaxed overflow-x-auto whitespace-pre pb-4">
                       {parsedLines.map((line, idx) => (
                         <div key={idx} className="mb-4 group">
-                          {line.chords.trim() && <div className="text-blue-400 font-bold h-6 select-none">{line.chords}</div>}
+                          {line.chords.trim() && <div className="text-blue-400 font-bold h-5 sm:h-6 select-none">{line.chords}</div>}
                           <div className="text-white/80">{line.lyrics || (line.chords.trim() ? "" : "\n")}</div>
                         </div>
                       ))}
@@ -623,17 +648,26 @@ export default function App() {
                       <Sparkles className="w-6 h-6 text-amber-400" />
                       <h2 className="text-2xl font-serif italic text-amber-200">Daily Word</h2>
                     </div>
-                    <div className="flex items-center gap-2 bg-amber-900/20 rounded-lg p-1">
-                      <span className="text-[10px] uppercase tracking-widest text-amber-400/60 font-bold px-2">Version</span>
-                      <select 
-                        value={dailyVersion}
-                        onChange={(e) => setDailyVersion(e.target.value)}
-                        className="bg-transparent text-amber-200 text-xs font-bold focus:outline-none cursor-pointer"
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={fetchDailyVerse}
+                        className="p-2 bg-amber-900/20 hover:bg-amber-900/40 text-amber-400 rounded-lg transition-all"
+                        title="Refresh Daily Verse"
                       >
-                        {['NIV', 'KJV', 'ESV', 'NASB', 'NLT', 'NKJV', 'ASV', 'Ang Biblia', 'MBBTAG'].map(v => (
-                          <option key={v} value={v} className="bg-[#1a1a15]">{v}</option>
-                        ))}
-                      </select>
+                        <RotateCcw className="w-4 h-4" />
+                      </button>
+                      <div className="flex items-center gap-2 bg-amber-900/20 rounded-lg p-1">
+                        <span className="text-[10px] uppercase tracking-widest text-amber-400/60 font-bold px-2">Version</span>
+                        <select 
+                          value={dailyVersion}
+                          onChange={(e) => setDailyVersion(e.target.value)}
+                          className="bg-transparent text-amber-200 text-xs font-bold focus:outline-none cursor-pointer"
+                        >
+                          {['NIV', 'KJV', 'ESV', 'NASB', 'NLT', 'NKJV', 'ASV', 'Ang Biblia', 'MBBTAG'].map(v => (
+                            <option key={v} value={v} className="bg-[#1a1a15]">{v}</option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
                   </div>
                   {dailyVerse && (
@@ -764,119 +798,120 @@ export default function App() {
                         </div>
                       )}
 
-                      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                        {!bibleBook ? (
-                          <div className="md:col-span-8">
-                            <input 
-                              type="text" 
-                              placeholder="Search by topic (e.g. Love, Strength, Peace)..."
-                              className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
-                              value={bibleTopic}
-                              onChange={(e) => setBibleTopic(e.target.value)}
-                              onKeyDown={(e) => e.key === 'Enter' && findBibleVerses()}
-                            />
+                    <div className="grid grid-cols-2 sm:grid-cols-12 gap-3 sm:gap-4">
+                      {!bibleBook ? (
+                        <div className="col-span-2 sm:col-span-8">
+                          <input 
+                            type="text" 
+                            placeholder="Topic (e.g. Love, Peace)..."
+                            className="w-full bg-black/40 border border-white/10 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                            value={bibleTopic}
+                            onChange={(e) => setBibleTopic(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && findBibleVerses()}
+                          />
+                        </div>
+                      ) : (
+                        <>
+                          <div className="col-span-2 sm:col-span-3">
+                            <select 
+                              className="w-full bg-black/40 border border-white/10 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all appearance-none cursor-pointer text-white/60"
+                              value={bibleBook}
+                              onChange={(e) => setBibleBook(e.target.value)}
+                            >
+                              {BIBLE_BOOKS.map(book => (
+                                <option key={book} value={book} className="bg-[#1a1a1a]">{book}</option>
+                              ))}
+                            </select>
                           </div>
-                        ) : (
-                          <>
-                            <div className="md:col-span-3">
-                              <select 
-                                className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all appearance-none cursor-pointer text-white/60"
-                                value={bibleBook}
-                                onChange={(e) => setBibleBook(e.target.value)}
-                              >
-                                {BIBLE_BOOKS.map(book => (
-                                  <option key={book} value={book} className="bg-[#1a1a1a]">{book}</option>
-                                ))}
-                              </select>
-                            </div>
-                            <div className="md:col-span-1">
-                              <select 
-                                className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all appearance-none cursor-pointer text-white/60"
-                                value={bibleChapter}
-                                onChange={(e) => setBibleChapter(e.target.value)}
-                              >
-                                {Array.from({ length: 150 }, (_, i) => i + 1).map(n => (
-                                  <option key={n} value={n} className="bg-[#1a1a1a]">{n}</option>
-                                ))}
-                              </select>
-                            </div>
-                            {!showFullChapter && (
-                              <>
-                                <div className="md:col-span-1">
-                                  <select 
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all appearance-none cursor-pointer text-white/60"
-                                    value={bibleVerse}
-                                    onChange={(e) => setBibleVerse(e.target.value)}
-                                  >
-                                    {Array.from({ length: 176 }, (_, i) => i + 1).map(n => (
-                                      <option key={n} value={n} className="bg-[#1a1a1a]">{n}</option>
-                                    ))}
-                                  </select>
-                                </div>
-                                <div className="md:col-span-1">
-                                  <select 
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all appearance-none cursor-pointer text-white/60"
-                                    value={bibleEndVerse}
-                                    onChange={(e) => setBibleEndVerse(e.target.value)}
-                                  >
-                                    <option value="" className="bg-[#1a1a1a]">To</option>
-                                    {Array.from({ length: 176 }, (_, i) => i + 1).map(n => (
-                                      <option key={n} value={n} className="bg-[#1a1a1a]">{n}</option>
-                                    ))}
-                                  </select>
-                                </div>
-                              </>
-                            )}
-                            <div className="md:col-span-2 flex items-center gap-2 px-2">
-                              <input 
-                                type="checkbox" 
-                                id="fullChapter"
-                                checked={showFullChapter}
-                                onChange={(e) => setShowFullChapter(e.target.checked)}
-                                className="w-4 h-4 rounded border-white/10 bg-black/40 text-blue-600 focus:ring-blue-500/50"
-                              />
-                              <label htmlFor="fullChapter" className="text-xs font-bold text-white/40 uppercase tracking-widest cursor-pointer">Full Chapter</label>
-                            </div>
-                          </>
-                        )}
-                        
-                        <div className="md:col-span-2">
-                          <select 
-                            className="w-full h-full bg-black/40 border border-white/10 rounded-2xl py-4 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all appearance-none cursor-pointer text-white/60"
-                            value={bibleVersion}
-                            onChange={(e) => setBibleVersion(e.target.value)}
-                          >
-                            {['NIV', 'KJV', 'ESV', 'NASB', 'NLT', 'NKJV', 'ASV', 'Ang Biblia', 'MBBTAG'].map(v => (
-                              <option key={v} value={v} className="bg-[#1a1a1a]">{v}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div className="md:col-span-2">
-                          <button 
-                            onClick={findBibleVerses}
-                            disabled={loading || (!bibleTopic && !bibleBook)}
-                            className="w-full h-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-2xl font-bold transition-all shadow-lg shadow-blue-900/20 py-4"
-                          >
-                            {loading ? '...' : 'Find'}
-                          </button>
-                        </div>
+                          <div className="col-span-1 sm:col-span-1">
+                            <select 
+                              className="w-full bg-black/40 border border-white/10 rounded-2xl py-3 sm:py-4 px-3 sm:px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all appearance-none cursor-pointer text-white/60"
+                              value={bibleChapter}
+                              onChange={(e) => setBibleChapter(e.target.value)}
+                            >
+                              {Array.from({ length: BIBLE_CHAPTER_COUNTS[bibleBook] || 50 }, (_, i) => i + 1).map(n => (
+                                <option key={n} value={n} className="bg-[#1a1a1a]">{n}</option>
+                              ))}
+                            </select>
+                          </div>
+                          {!showFullChapter && (
+                            <>
+                              <div className="col-span-1 sm:col-span-1">
+                                <select 
+                                  className="w-full bg-black/40 border border-white/10 rounded-2xl py-3 sm:py-4 px-3 sm:px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all appearance-none cursor-pointer text-white/60"
+                                  value={bibleVerse}
+                                  onChange={(e) => setBibleVerse(e.target.value)}
+                                >
+                                  {Array.from({ length: bibleMaxVerses }, (_, i) => i + 1).map(n => (
+                                    <option key={n} value={n} className="bg-[#1a1a1a]">{n}</option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div className="col-span-1 sm:col-span-1">
+                                <select 
+                                  className="w-full bg-black/40 border border-white/10 rounded-2xl py-3 sm:py-4 px-3 sm:px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all appearance-none cursor-pointer text-white/60"
+                                  value={bibleEndVerse}
+                                  onChange={(e) => setBibleEndVerse(e.target.value)}
+                                >
+                                  <option value="" className="bg-[#1a1a1a]">To</option>
+                                  {Array.from({ length: bibleMaxVerses }, (_, i) => i + 1).map(n => (
+                                    <option key={n} value={n} className="bg-[#1a1a1a]">{n}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            </>
+                          )}
+                          <div className="col-span-1 sm:col-span-2 flex items-center gap-2 px-1 sm:px-2">
+                            <input 
+                              type="checkbox" 
+                              id="fullChapter"
+                              checked={showFullChapter}
+                              onChange={(e) => setShowFullChapter(e.target.checked)}
+                              className="w-4 h-4 rounded border-white/10 bg-black/40 text-blue-600 focus:ring-blue-500/50"
+                            />
+                            <label htmlFor="fullChapter" className="text-[10px] sm:text-xs font-bold text-white/40 uppercase tracking-widest cursor-pointer">Full</label>
+                          </div>
+                        </>
+                      )}
+                      
+                      <div className="col-span-2 sm:col-span-2">
+                        <select 
+                          className="w-full h-full bg-black/40 border border-white/10 rounded-2xl py-3 sm:py-4 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all appearance-none cursor-pointer text-white/60"
+                          value={bibleVersion}
+                          onChange={(e) => setBibleVersion(e.target.value)}
+                        >
+                          {['NIV', 'KJV', 'ESV', 'NASB', 'NLT', 'NKJV', 'ASV', 'Ang Biblia', 'MBBTAG'].map(v => (
+                            <option key={v} value={v} className="bg-[#1a1a1a]">{v}</option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div className="col-span-2 sm:col-span-2">
+                        <button 
+                          onClick={findBibleVerses}
+                          disabled={loading || (!bibleTopic && !bibleBook)}
+                          className="w-full h-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-2xl font-bold transition-all shadow-lg shadow-blue-900/20 py-4"
+                        >
+                          {loading ? '...' : 'Find'}
+                        </button>
                       </div>
                     </div>
                   </div>
+                </div>
+              </section>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {bibleVerses.map((v, i) => (
-                      <motion.div 
-                        key={i}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="bg-white/[0.03] border border-white/10 rounded-3xl p-6 flex flex-col justify-between group hover:bg-white/[0.05] transition-all"
-                      >
-                        <p className="text-lg text-white/80 italic mb-6 leading-relaxed">"{v.text}"</p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-white/40 font-bold text-xs tracking-widest uppercase">{v.reference}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {bibleVerses.map((v, i) => (
+                    <motion.div 
+                      key={i}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.1 }}
+                      className="bg-white/[0.03] border border-white/10 rounded-3xl p-6 flex flex-col justify-between group hover:bg-white/[0.05] transition-all"
+                    >
+                      <p className="text-lg text-white/80 italic mb-6 leading-relaxed">"{v.text}"</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-white/40 font-bold text-xs tracking-widest uppercase">{v.reference}</span>
                         <div className="flex items-center gap-2">
                           <button 
                             onClick={() => fetchFullChapter(v.reference)}
@@ -900,10 +935,10 @@ export default function App() {
                             <ImageIcon className="w-4 h-4" />
                           </button>
                         </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
 
                   {/* Full Chapter Display */}
                   <AnimatePresence>
@@ -927,12 +962,11 @@ export default function App() {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </section>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </main>
-      </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </main>
+        </div>
 
       {/* Design Modal */}
       <AnimatePresence>
@@ -950,23 +984,85 @@ export default function App() {
               </div>
 
               {/* The Design Card */}
-              <div className="aspect-square w-full rounded-3xl overflow-hidden relative shadow-2xl" id="verse-design">
-                {/* Background (Sunlight/Sky effect) */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#fdfcfb] via-[#e2d1c3] to-[#fdfcfb]">
-                  <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]" />
-                  {/* Sun effect */}
-                  <div className="absolute -top-20 -right-20 w-[400px] h-[400px] bg-gradient-to-br from-amber-200/40 to-transparent blur-[120px] rounded-full" />
-                  <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-white/40 to-transparent" />
-                </div>
-                
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
-                  <div className="mb-8">
-                    <Sparkles className="w-10 h-10 text-amber-800/20 mx-auto" />
+              <div 
+                className={`aspect-square w-full rounded-3xl overflow-hidden relative shadow-2xl transition-all duration-500`} 
+                id="verse-design"
+              >
+                {/* Backgrounds */}
+                {designConfig.gradient === 'warm' && (
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#fdfcfb] via-[#e2d1c3] to-[#fdfcfb]">
+                    <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]" />
+                    <div className="absolute -top-20 -right-20 w-[400px] h-[400px] bg-gradient-to-br from-amber-200/40 to-transparent blur-[120px] rounded-full" />
                   </div>
-                  <p className="text-3xl font-serif italic text-amber-950 leading-tight mb-10 drop-shadow-sm">"{designVerse.text}"</p>
-                  <div className="w-16 h-[1px] bg-amber-900/20 mb-8" />
-                  <span className="text-amber-900/60 font-bold tracking-[0.3em] uppercase text-[10px]">{designVerse.reference}</span>
-                  <p className="mt-2 text-[8px] text-amber-900/30 uppercase tracking-widest font-bold">ChordFlow Bible</p>
+                )}
+                {designConfig.gradient === 'ocean' && (
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#2b5876] to-[#4e4376]">
+                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
+                    <div className="absolute -bottom-20 -left-20 w-[400px] h-[400px] bg-blue-400/20 blur-[120px] rounded-full" />
+                  </div>
+                )}
+                {designConfig.gradient === 'nature' && (
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#134e5e] to-[#71b280]">
+                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/leaf.png')]" />
+                  </div>
+                )}
+                {designConfig.gradient === 'minimal' && (
+                  <div className="absolute inset-0 bg-white">
+                    <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
+                  </div>
+                )}
+                {designConfig.gradient === 'dark' && (
+                  <div className="absolute inset-0 bg-[#0f0f0f]">
+                    <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-blue-500/10 blur-[100px] rounded-full" />
+                  </div>
+                )}
+                
+                <div className={`absolute inset-0 flex flex-col p-12 ${designConfig.align === 'center' ? 'items-center justify-center text-center' : designConfig.align === 'left' ? 'items-start justify-center text-left' : 'items-end justify-center text-right'}`}>
+                  <div className="mb-8">
+                    <Sparkles className={`w-10 h-10 mx-auto ${designConfig.gradient === 'dark' || designConfig.gradient === 'ocean' ? 'text-white/20' : 'text-black/10'}`} />
+                  </div>
+                  <p className={`text-3xl leading-tight mb-10 drop-shadow-sm ${designConfig.font === 'serif' ? 'font-serif italic' : designConfig.font === 'mono' ? 'font-mono' : 'font-sans font-bold'} ${designConfig.gradient === 'dark' || designConfig.gradient === 'ocean' || designConfig.gradient === 'nature' ? 'text-white' : 'text-amber-950'}`}>
+                    "{designVerse.text}"
+                  </p>
+                  <div className={`w-16 h-[1px] mb-8 ${designConfig.gradient === 'dark' || designConfig.gradient === 'ocean' ? 'bg-white/20' : 'bg-black/10'}`} />
+                  <span className={`font-bold tracking-[0.3em] uppercase text-[10px] ${designConfig.gradient === 'dark' || designConfig.gradient === 'ocean' || designConfig.gradient === 'nature' ? 'text-white/60' : 'text-black/40'}`}>
+                    {designVerse.reference}
+                  </span>
+                  <p className={`mt-2 text-[8px] uppercase tracking-widest font-bold ${designConfig.gradient === 'dark' || designConfig.gradient === 'ocean' || designConfig.gradient === 'nature' ? 'text-white/20' : 'text-black/20'}`}>
+                    ChordFlow Bible
+                  </p>
+                </div>
+              </div>
+
+              {/* Customization Controls */}
+              <div className="grid grid-cols-2 gap-6 bg-white/5 p-6 rounded-3xl border border-white/10">
+                <div className="space-y-3">
+                  <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Theme</p>
+                  <div className="flex flex-wrap gap-2">
+                    {['warm', 'ocean', 'nature', 'minimal', 'dark'].map(t => (
+                      <button 
+                        key={t}
+                        onClick={() => setDesignConfig(prev => ({ ...prev, gradient: t }))}
+                        className={`w-8 h-8 rounded-full border-2 transition-all ${designConfig.gradient === t ? 'border-blue-500 scale-110' : 'border-transparent opacity-60'}`}
+                        style={{ background: t === 'warm' ? 'linear-gradient(to br, #fdfcfb, #e2d1c3)' : t === 'ocean' ? 'linear-gradient(to br, #2b5876, #4e4376)' : t === 'nature' ? 'linear-gradient(to br, #134e5e, #71b280)' : t === 'minimal' ? '#fff' : '#0f0f0f' }}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Font</p>
+                  <div className="flex gap-2">
+                    {['serif', 'sans', 'mono'].map(f => (
+                      <button 
+                        key={f}
+                        onClick={() => setDesignConfig(prev => ({ ...prev, font: f }))}
+                        className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all ${designConfig.font === f ? 'bg-blue-600 border-blue-500 text-white' : 'bg-white/5 border-white/10 text-white/40'}`}
+                      >
+                        {f.charAt(0).toUpperCase() + f.slice(1)}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -993,7 +1089,12 @@ export default function App() {
 
       {/* Mobile Scroll Controls */}
       {isScrolling && (
-        <div className="fixed bottom-8 right-8 z-50 flex flex-col gap-2 scale-125 origin-bottom-right">
+        <div className="fixed bottom-8 right-8 z-50 flex flex-col gap-3 scale-125 origin-bottom-right">
+          <div className="bg-black/80 backdrop-blur-md border border-white/10 rounded-full p-1 flex flex-col items-center gap-2">
+            <button onClick={() => setScrollSpeed(s => Math.min(5, s + 0.5))} className="p-2 hover:bg-white/10 rounded-full text-white/60"><Plus className="w-4 h-4" /></button>
+            <span className="text-[8px] font-bold text-blue-400">{scrollSpeed}x</span>
+            <button onClick={() => setScrollSpeed(s => Math.max(0.5, s - 0.5))} className="p-2 hover:bg-white/10 rounded-full text-white/60"><Minus className="w-4 h-4" /></button>
+          </div>
           <button onClick={() => setIsScrolling(false)} className="w-12 h-12 bg-red-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-red-700 transition-colors"><Pause className="w-6 h-6" /></button>
         </div>
       )}
