@@ -1,5 +1,5 @@
 {
-  "name": "ChordFlow",
-  "description": "A musician-friendly lyrics and chords viewer with real-time transposition and auto-scroll.",
+  "name": "FaithHub",
+  "description": "A comprehensive musician-friendly lyrics and chords viewer with integrated Bible tools, real-time transposition, and auto-scroll.",
   "requestFramePermissions": []
 }

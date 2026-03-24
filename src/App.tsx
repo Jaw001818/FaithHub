@@ -349,7 +349,7 @@ export default function App() {
                 <Music className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-black tracking-tighter text-white">CHORDLY</h1>
+                <h1 className="text-xl font-black tracking-tighter text-white uppercase">FaithHub</h1>
                 <p className="text-[10px] font-bold text-blue-500 tracking-[0.2em] uppercase">Pro Setlist</p>
               </div>
             </div>
@@ -434,59 +434,82 @@ export default function App() {
         </div>
       </motion.aside>
 
+      {/* Sidebar Toggle - Separate Navigation */}
+      {activeTab === 'chords' && (
+        <button 
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className={`fixed top-4 left-4 z-[80] p-3 rounded-xl transition-all shadow-2xl ${isSidebarOpen ? 'bg-blue-600 text-white' : 'bg-[#1a1a1a] text-white/60 hover:bg-white/10 border border-white/10'} lg:flex items-center gap-2 hidden`}
+        >
+          <ListMusic className="w-5 h-5" />
+          <span className="text-xs font-bold uppercase tracking-wider">Lineup</span>
+        </button>
+      )}
+
       {/* Main Content Area */}
       <div 
         ref={mainContentRef}
         className="flex-1 h-screen overflow-y-auto relative flex flex-col"
       >
         {/* Sticky Header */}
-        <header className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/10 px-4 py-3">
-          <div className="max-w-4xl mx-auto flex flex-col gap-4">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-              <div className="flex items-center justify-between sm:justify-start gap-4">
-                <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                    className={`p-2 rounded-lg transition-colors ${isSidebarOpen ? 'bg-blue-600 text-white' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
-                  >
-                    <ListMusic className="w-5 h-5" />
-                  </button>
-                  <div className="flex items-center gap-1 bg-white/5 rounded-full p-1">
-                    <button 
-                      onClick={() => setActiveTab('chords')}
-                      className={`px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${activeTab === 'chords' ? 'bg-blue-600 text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
-                    >
-                      Chords
-                    </button>
-                    <button 
-                      onClick={() => setActiveTab('bible')}
-                      className={`px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${activeTab === 'bible' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
-                    >
-                      Bible
-                    </button>
-                  </div>
-                </div>
+        <header className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/10 px-4 py-6">
+          <div className="max-w-4xl mx-auto flex flex-col items-center gap-6">
+            {/* Navigation Tabs - Centered */}
+            <div className="flex items-center gap-4">
+              {/* Mobile Sidebar Toggle (only visible on mobile) */}
+              {activeTab === 'chords' && (
+                <button 
+                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                  className={`lg:hidden p-2.5 rounded-xl transition-colors ${isSidebarOpen ? 'bg-blue-600 text-white' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
+                >
+                  <ListMusic className="w-5 h-5" />
+                </button>
+              )}
+              
+              <div className="flex items-center gap-1 bg-white/5 rounded-full p-1 border border-white/5">
+                <button 
+                  onClick={() => {
+                    setActiveTab('chords');
+                  }}
+                  className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'chords' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' : 'text-white/40 hover:text-white'}`}
+                >
+                  Chords
+                </button>
+                <button 
+                  onClick={() => {
+                    setActiveTab('bible');
+                    setIsSidebarOpen(false);
+                  }}
+                  className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'bible' ? 'bg-amber-600 text-white shadow-lg shadow-amber-900/40' : 'text-white/40 hover:text-white'}`}
+                >
+                  Bible
+                </button>
+              </div>
 
+              {/* Mobile Scroll Controls */}
+              {activeTab === 'chords' && (
                 <div className="flex sm:hidden items-center gap-2">
                   <button 
                     onClick={() => setIsScrolling(!isScrolling)}
-                    className={`p-2 rounded-full transition-colors ${isScrolling ? 'bg-blue-600 text-white' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
+                    className={`p-2.5 rounded-full transition-colors ${isScrolling ? 'bg-blue-600 text-white' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
                   >
                     {isScrolling ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
                   </button>
                 </div>
-              </div>
+              )}
+            </div>
 
-              <div className="flex-1 relative">
-                <form onSubmit={handleSearch} className="relative">
+            {/* Search Bar - Centered */}
+            {activeTab === 'chords' && (
+              <div className="w-full max-w-xl relative">
+                <form onSubmit={handleSearch} className="relative group">
                   <input
                     type="text"
-                    placeholder="Search songs..."
-                    className="w-full bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                    placeholder="Search for songs, artists, or lyrics..."
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all placeholder:text-white/20 group-hover:bg-white/10"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-blue-400 transition-colors" />
                 </form>
 
                 {/* Search Results Dropdown */}
@@ -496,26 +519,26 @@ export default function App() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full left-0 right-0 mt-2 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-[100]"
+                      className="absolute top-full left-0 right-0 mt-3 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-[100] backdrop-blur-xl"
                     >
-                      <div className="p-2 border-b border-white/5 flex items-center justify-between">
+                      <div className="p-3 border-b border-white/5 flex items-center justify-between bg-white/5">
                         <span className="text-[10px] uppercase tracking-widest text-white/40 font-bold px-2">Search Results</span>
-                        <button onClick={() => setShowSearchResults(false)} className="p-1 hover:bg-white/5 rounded-full">
+                        <button onClick={() => setShowSearchResults(false)} className="p-1 hover:bg-white/10 rounded-full transition-colors">
                           <X className="w-4 h-4" />
                         </button>
                       </div>
-                      <div className="max-h-[300px] overflow-y-auto">
+                      <div className="max-h-[400px] overflow-y-auto">
                         {searchResults.map((res, i) => (
                           <button 
                             key={i}
                             onClick={() => fetchSongDetails(res.title, res.artist)}
-                            className="w-full text-left p-3 hover:bg-white/5 flex items-center justify-between group"
+                            className="w-full text-left p-4 hover:bg-blue-600/10 flex items-center justify-between group/item transition-colors border-b border-white/5 last:border-0"
                           >
                             <div>
-                              <h4 className="font-bold text-sm">{res.title}</h4>
+                              <h4 className="font-bold text-sm group-hover/item:text-blue-400 transition-colors">{res.title}</h4>
                               <p className="text-xs text-white/40">{res.artist}</p>
                             </div>
-                            <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-blue-400 transition-all" />
+                            <ChevronRight className="w-4 h-4 text-white/10 group-hover/item:text-blue-400 group-hover/item:translate-x-1 transition-all" />
                           </button>
                         ))}
                       </div>
@@ -523,22 +546,38 @@ export default function App() {
                   )}
                 </AnimatePresence>
               </div>
+            )}
 
-              <div className="hidden sm:flex items-center gap-2">
+            {/* Desktop Scroll Controls (Hidden on mobile, centered here) */}
+            {activeTab === 'chords' && (
+              <div className="hidden sm:flex items-center gap-4">
                 <button 
                   onClick={() => setIsScrolling(!isScrolling)}
-                  className={`p-2 rounded-full transition-colors ${isScrolling ? 'bg-blue-600 text-white' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
+                  className={`flex items-center gap-2 px-6 py-2 rounded-full font-bold transition-all ${isScrolling ? 'bg-red-600 text-white' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-900/20'}`}
                 >
-                  {isScrolling ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                  {isScrolling ? (
+                    <>
+                      <Pause className="w-4 h-4" />
+                      Stop Scroll
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-4 h-4" />
+                      Start Scroll
+                    </>
+                  )}
                 </button>
               </div>
-            </div>
+            )}
+          </div>
 
-            {song && activeTab === 'chords' && (
+          {/* Song Metadata Bar (Transpose, etc.) */}
+          {song && activeTab === 'chords' && (
+            <div className="max-w-4xl mx-auto mt-6">
               <motion.div 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2 border-t border-white/5"
+                className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-6 border-t border-white/10"
               >
                 <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                   <div className="flex items-center bg-white/5 rounded-lg p-1 flex-1 sm:flex-none justify-between sm:justify-start">
@@ -600,8 +639,8 @@ export default function App() {
                   </div>
                 </div>
               </motion.div>
-            )}
-          </div>
+            </div>
+          )}
         </header>
 
         <main className="max-w-4xl mx-auto px-4 py-8 pb-32 flex-1 w-full">
@@ -634,7 +673,7 @@ export default function App() {
                   <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center"><Music className="w-10 h-10 text-white/20" /></div>
                   <h3 className="text-2xl font-bold text-white/80">Ready for your set?</h3>
                   <div className="flex flex-wrap justify-center gap-2 mt-4">
-                    {['Let It Be', 'Wonderwall', 'Hallelujah', 'Creep'].map(s => <button key={s} onClick={() => { setSearchQuery(s); searchSongs(s); }} className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm transition-all">{s}</button>)}
+                    {['Way Maker', 'Goodness of God', '10,000 Reasons', 'Amazing Grace', 'What A Beautiful Name'].map(s => <button key={s} onClick={() => { setSearchQuery(s); searchSongs(s); }} className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm transition-all">{s}</button>)}
                   </div>
                 </motion.div>
               )
@@ -1030,7 +1069,7 @@ export default function App() {
                     {designVerse.reference}
                   </span>
                   <p className={`mt-2 text-[8px] uppercase tracking-widest font-bold ${designConfig.gradient === 'dark' || designConfig.gradient === 'ocean' || designConfig.gradient === 'nature' ? 'text-white/20' : 'text-black/20'}`}>
-                    ChordFlow Bible
+                    FaithHub Bible
                   </p>
                 </div>
               </div>
@@ -1088,7 +1127,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* Mobile Scroll Controls */}
-      {isScrolling && (
+      {isScrolling && activeTab === 'chords' && (
         <div className="fixed bottom-8 right-8 z-50 flex flex-col gap-3 scale-125 origin-bottom-right">
           <div className="bg-black/80 backdrop-blur-md border border-white/10 rounded-full p-1 flex flex-col items-center gap-2">
             <button onClick={() => setScrollSpeed(s => Math.min(5, s + 0.5))} className="p-2 hover:bg-white/10 rounded-full text-white/60"><Plus className="w-4 h-4" /></button>
